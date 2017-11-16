@@ -1,11 +1,11 @@
 // 全部小球的个数, 取值为 3 ~ 999
-const ballNum = 7;
+const ballNum = 12;
 
 // 正常小球的重量
 const ball = 1;
 
 // 特殊小球的重量
-const theBall = 2;
+const theBall = 0;
 
 // 通过小球数量计算得到的需要的次数
 const times = getTimes(ballNum);
@@ -87,6 +87,8 @@ function getGroupNum(numStr) {
 }
 
 let count = 0;
+
+// 转换十进制数字为所需的进制
 function convertNum(num, n = 3) {
   let t = num;
   let result = '';
@@ -149,42 +151,79 @@ function setNum(balls, times) {
   const len = balls.length;
   const zeroNum = generateZeroNum(times)
   let result = [];
-  if (len % 3 === 0) {
-    const t = len / 3;
-    const num = zeroNum.slice(0, t);
-    num.forEach((e) => {
-      result = result.concat(getGroupNum(e))
-    });
-    return result;
-  } else if (len % 3 === 1) {
-    const t = Math.floor(len / 3);
-    const num = zeroNum.slice(0, t);
-    num.forEach((e) => {
-      result = result.concat(getGroupNum(e))
-    });
+  const t = Math.floor(len / 3);
+  const num = zeroNum.slice(0, t);
+  num.forEach((e) => {
+    result = result.concat(getGroupNum(e))
+  });
+  if (len % 3 === 1) {
     const n0 = zeroNum.slice(t, t + 1)[0].split('');
     result.push(n0.map(convertFunc).join(''))
+    result.push(n0.join(''))
+    result.push(n0.map(convertFunc).map(convertFunc).join(''))
   } else if (len % 3 === 2) {
-    const t = Math.floor(len / 3);
-    const num = zeroNum.slice(0, t);
-    num.forEach((e) => {
-      result = result.concat(getGroupNum(e))
-    });
     const n0 = zeroNum.slice(t, t + 1)[0].split('');
     result.push(n0.join(''));
     result.push(n0.map(convertFunc).map(convertFunc).join(''));
+    result.push(n0.map(convertFunc).join(''));
   }
 
   return result;
 }
 
-// console.log(setNum(balls, times));
+function weigh(balls, times, num) {
+  const result = [];
 
-// test
-// const nums = getGroupNum('012');
+  for (let i = 0; i < times; i++) {
+    const left = [];
+    const right = [];
+    num.forEach((e, index) => {
+      if (e[i] === '0') {
+        left.push(index);
+      } else if (e[i] === '2') {
+        right.push(index);
+      }
+    })
+    const reduceFunc = (pre, curr) => {
+      const currWeight = balls[curr] === undefined ? ball : balls[curr];
 
-// console.log(nums);
+      return pre + currWeight;
+    };
 
-// nums.forEach((e) => {
-//   console.log(getReverseNum(e));
-// })
+    const leftWeight = left.reduce(reduceFunc, 0);
+    const rightWeight = right.reduce(reduceFunc, 0);
+
+    if (leftWeight > rightWeight) {
+      result.push('0')
+      console.log(`第${i + 1}次称量：左边重`);
+    } else if (leftWeight < rightWeight) {
+      result.push('2')
+      console.log(`第${i + 1}次称量：右边重`);
+    } else if (leftWeight === rightWeight) {
+      result.push('1')
+      console.log(`第${i + 1}次称量：一样重`);
+    }
+  }
+
+  return result;
+}
+
+function findBall(balls, times) {
+  // 编号
+  const num = setNum(balls, times);
+
+  // 称量
+  const result = weigh(balls, times, num);
+
+  // 找到小球
+  let theNum = result.join('');
+  const index = num.findIndex((e) => e === theNum);
+  if (index >= 0) {
+    return index;
+  }
+  theNum = getReverseNum(theNum);
+  return num.findIndex((e) => e === theNum);
+}
+
+// console.log(balls);
+// console.log(findBall(balls, times) + 1);
