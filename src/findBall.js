@@ -65,27 +65,31 @@ function setNum(balls, times) {
 }
 
 // 称重
-function weigh(balls, times, num, ballWeight) {
+function weigh(balls, times, num) {
   const result = [];
 
+  let ballWeight = 0;
+  const reduceFunc = (pre, curr) => {
+    const currWeight = balls[curr] === undefined ? ballWeight : balls[curr];
+
+    return pre + currWeight;
+  };
   for (let i = 0; i < times; i++) {
-    const left = [];
-    const right = [];
+    const leftIndex = [];
+    const rightIndex = [];
+    const otherIndex = [];
     num.forEach((e, index) => {
       if (e[i] === '0') {
-        left.push(index);
+        leftIndex.push(index);
       } else if (e[i] === '2') {
-        right.push(index);
+        rightIndex.push(index);
+      } else {
+        otherIndex.push(index);
       }
     });
-    const reduceFunc = (pre, curr) => {
-      const currWeight = balls[curr] === undefined ? ballWeight : balls[curr];
 
-      return pre + currWeight;
-    };
-
-    const leftWeight = left.reduce(reduceFunc, 0);
-    const rightWeight = right.reduce(reduceFunc, 0);
+    const leftWeight = leftIndex.reduce(reduceFunc, 0);
+    const rightWeight = rightIndex.reduce(reduceFunc, 0);
 
     if (leftWeight > rightWeight) {
       result.push('0');
@@ -97,17 +101,24 @@ function weigh(balls, times, num, ballWeight) {
       result.push('1');
       console.log(`第${i + 1}次称量：一样重`);
     }
+    if (i === 0) {
+      if (result[0] === '1') {
+        ballWeight = balls[leftIndex[0]];
+      } else {
+        ballWeight = balls[otherIndex[0]];
+      }
+    }
   }
 
   return result;
 }
 
-function findBall(balls, times, ballWeight) {
+function findBall(balls, times) {
   // 编号
   const num = setNum(balls, times);
 
   // 称量
-  const result = weigh(balls, times, num, ballWeight);
+  const result = weigh(balls, times, num);
 
   // 找到小球
   let theNum = result.join('');

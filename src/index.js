@@ -16,7 +16,8 @@ const times = getTimes(ballNum);
 // 随机生成一组小球, 其中有一个为特殊小球
 const balls = generateBalls(ball, theBall, ballNum);
 
-const theBallNum = findBall(balls, times, ball);
+const theBallNum = findBall(balls, times);
 
 // console.log(balls);
+// console.log(times);
 // console.log(theBallNum);

@@ -19,18 +19,18 @@ describe('getTimes', () => {
 describe('findBall', () => {
   test('findBall(3)', () => {
     const times = getTimes(3);
-    expect(findBall([1, 1, 2], times, 1)).toBe(2);
+    expect(findBall([1, 1, 2], times)).toBe(2);
   });
   test('findBall(6)', () => {
     const times = getTimes(6);
-    expect(findBall([1, 2, 1, 1, 1, 1], times, 1)).toBe(1);
+    expect(findBall([1, 2, 1, 1, 1, 1], times)).toBe(1);
   });
   test('findBall(7)', () => {
     const times = getTimes(7);
-    expect(findBall([1, 1, 1, 2, 1, 1, 1], times, 1)).toBe(3);
+    expect(findBall([1, 1, 1, 2, 1, 1, 1], times)).toBe(3);
   });
   test('findBall(8)', () => {
     const times = getTimes(8);
-    expect(findBall([1, 1, 1, 1, 0, 1, 1, 1], times, 1)).toBe(4);
+    expect(findBall([1, 1, 1, 1, 0, 1, 1, 1], times)).toBe(4);
   });
 });
