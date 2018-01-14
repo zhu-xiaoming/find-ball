@@ -30,6 +30,7 @@ module.exports = {
     new CleanWebpackPlugin(['dist/*.*']),
     new HtmlWebpackPlugin({
       title: 'find ball',
+      template: 'src/index.html',
     }),
   ],
   output: {

@@ -1,6 +1,11 @@
 import utils from './utils';
 
-function generateBalls(ballNum, ballWeight, theBallWeight) {
+function generateBalls(ballNum) {
+  const ballWeight = utils.getRandomInt(7, 3);
+  let theBallWeight = utils.getRandomInt(10);
+  while (theBallWeight === ballWeight) {
+    theBallWeight = utils.getRandomInt(10);
+  }
   const balls = [];
   for (let i = 0; i < ballNum; i++) {
     balls.push(ballWeight);
@@ -47,17 +52,21 @@ function setNum(balls, times) {
     const n0 = zeroNum.slice(t, t + 1)[0].split('');
     result.push(n0.map(utils.convertFunc).join(''));
     result.push(n0.join(''));
-    result.push(n0
-      .map(utils.convertFunc)
-      .map(utils.convertFunc)
-      .join(''));
+    result.push(
+      n0
+        .map(utils.convertFunc)
+        .map(utils.convertFunc)
+        .join(''),
+    );
   } else if (len % 3 === 2) {
     const n0 = zeroNum.slice(t, t + 1)[0].split('');
     result.push(n0.join(''));
-    result.push(n0
-      .map(utils.convertFunc)
-      .map(utils.convertFunc)
-      .join(''));
+    result.push(
+      n0
+        .map(utils.convertFunc)
+        .map(utils.convertFunc)
+        .join(''),
+    );
     result.push(n0.map(utils.convertFunc).join(''));
   }
 
@@ -67,6 +76,7 @@ function setNum(balls, times) {
 // 称重
 function weigh(balls, times, num) {
   const result = [];
+  const weighProcess = [];
 
   let ballWeight = 0;
   const reduceFunc = (pre, curr) => {
@@ -87,19 +97,21 @@ function weigh(balls, times, num) {
         otherIndex.push(index);
       }
     });
+    weighProcess.push({
+      leftIndex,
+      rightIndex,
+      otherIndex,
+    });
 
     const leftWeight = leftIndex.reduce(reduceFunc, 0);
     const rightWeight = rightIndex.reduce(reduceFunc, 0);
 
     if (leftWeight > rightWeight) {
       result.push('0');
-      console.log(`第${i + 1}次称量：左边重`);
     } else if (leftWeight < rightWeight) {
       result.push('2');
-      console.log(`第${i + 1}次称量：右边重`);
     } else if (leftWeight === rightWeight) {
       result.push('1');
-      console.log(`第${i + 1}次称量：一样重`);
     }
     if (i === 0) {
       if (result[0] === '1') {
@@ -110,7 +122,7 @@ function weigh(balls, times, num) {
     }
   }
 
-  return result;
+  return { result, weighProcess };
 }
 
 function findBall(balls, times) {
@@ -118,16 +130,26 @@ function findBall(balls, times) {
   const num = setNum(balls, times);
 
   // 称量
-  const result = weigh(balls, times, num);
+  const { result, weighProcess } = weigh(balls, times, num);
 
   // 找到小球
   let theNum = result.join('');
   const index = num.findIndex(e => e === theNum);
   if (index >= 0) {
-    return index;
+    return {
+      theBallIndex: index,
+      theBallNum: theNum,
+      num,
+      weighProcess,
+    };
   }
   theNum = utils.getReverseNum(theNum);
-  return num.findIndex(e => e === theNum);
+  return {
+    theBallIndex: num.findIndex(e => e === theNum),
+    theBallNum: utils.getReverseNum(theNum),
+    num,
+    weighProcess,
+  };
 }
 
 export default findBall;
